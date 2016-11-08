@@ -3,7 +3,7 @@
 
 import sys
 
-def lights_toggle(low_left, top_right, **light_grid):
+def lights_toggle(low_left, top_right, *light_grid):
   #no output, just change a grid (dict) and set a range to flip in each cell
   #split the coordinate instructions into ints
   snip_bottom = low_left.split(",")
@@ -12,16 +12,16 @@ def lights_toggle(low_left, top_right, **light_grid):
   grid_y = int(snip_bottom[1])
   while grid_x <= int(snip_top[0]):
     while grid_y <= int(snip_top[1]):
-      if light_grid.get(str(grid_x)+", "+str(grid_y)) == 1:
-        light_grid[str(grid_x)+", "+ str(grid_y)] = 0
+      if light_grid[grid_x[grid_y]] == 1:
+        light_grid[grid_x[grid_y]] = 0
       else:
-       light_grid[str(grid_x)+", "+str(grid_y)] = 1
+       light_grid[grid_x[grid_y]] = 1
       grid_y = grid_y + 1
     grid_y = int(snip_bottom[1])
     grid_x = grid_x + 1
   return
 
-def lights_off(low_left, top_right, **light_grid):
+def lights_off(low_left, top_right, *light_grid):
   #no output, just change a grid (dict) and set a range = 0 in each cell
   #split the coordinate instructions into ints
   snip_bottom = low_left.split(",")
@@ -30,14 +30,13 @@ def lights_off(low_left, top_right, **light_grid):
   grid_y = int(snip_bottom[1])
   while grid_x <= int(snip_top[0]):
     while grid_y <= int(snip_top[1]):
-      if light_grid.get(str(grid_x)+", "+str(grid_y)) == 1:
-        light_grid[str(grid_x)+", "+ str(grid_y)] = 0
+      light_grid[grid_x[grid_y]] = 0
       grid_y = grid_y + 1
     grid_y = int(snip_bottom[1])
     grid_x = grid_x + 1
   return
 
-def lights_on(low_left, top_right, **light_grid):
+def lights_on(low_left, top_right, *light_grid):
   #no output, just change a grid (dict) and set a range = 1 in each cell
   #split the coordinate instructions into ints
   snip_bottom = low_left.split(",")
@@ -46,8 +45,7 @@ def lights_on(low_left, top_right, **light_grid):
   grid_y = int(snip_bottom[1])
   while grid_x <= int(snip_top[0]):
     while grid_y <= int(snip_top[1]):
-      if light_grid.get(str(grid_x)+", "+str(grid_y)) == 0:
-        light_grid[str(grid_x)+", "+str(grid_y)] = 1
+      light_grid[grid_x[grid_y]] = 1
       grid_y = grid_y + 1
     grid_y = 0
     grid_x = grid_x + 1
@@ -61,7 +59,7 @@ def count_lights(grid):
   grid_y = 0
   while grid_x <= 999:
     while grid_y <= 999:
-      if light_grid.get(str(grid_x)+", "+ str(grid_y)) == 1:
+      if light_grid[grid_x[grid_y]] == 1:
         lit = lit + 1
       grid_y = grid_y + 1
     grid_y = 0
@@ -73,13 +71,13 @@ def defeat_neighbor(filename):
   #output: number of lights currently lit
   lit = 0
   #fill the grid with one million lights
-  light_grid = {}
+  light_grid = []
   grid_x = 0
   grid_y = 0
   while grid_x <= 999:
+    light_grid.append([])
     while grid_y <= 999:
-      #python will throw a hissy fit if you don't make the keys strings :|
-      light_grid[str(grid_x)+", "+str(grid_y)] = 0
+      light_grid[grid_x].append(0)
       grid_y = grid_y + 1
     grid_y = 0
     grid_x = grid_x + 1
@@ -88,12 +86,12 @@ def defeat_neighbor(filename):
      #separate the command into words, then use the first 2 to determine action
     snip = command.split()
     if snip[0] == "toggle":
-      light_grid = toggle(snip[1], snip[3], **light_grid)
+      light_grid = toggle(snip[1], snip[3], *light_grid)
     elif snip[0] == "turn":
       if snip[1] == "on":
-        light_grid = lights_on(snip[2], snip[4], **light_grid)
+        light_grid = lights_on(snip[2], snip[4], *light_grid)
       elif snip[1] == "off":
-        light_grid = lights_off(snip[2], snip[4], **light_grid)
+        light_grid = lights_off(snip[2], snip[4], *light_grid)
       else:
         print "Error: Invalid instructions!"
     else:
